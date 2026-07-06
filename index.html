@@ -336,7 +336,7 @@
                     <!-- Status Pemain 2 (Hanya aktif di Versus Mode) -->
                     <div id="p2-status-panel" class="hidden flex-grow p-3 bg-pink-950/20 border border-pink-500/30 rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.05)]">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <span class="w-3.5 h-3.5 rounded-full bg-pink-500 shadow-md"></span>
+                            <span id="p2-color-indicator" class="w-3.5 h-3.5 rounded-full bg-pink-500 shadow-md"></span>
                             <span id="p2-display-name" class="font-bold text-sm text-pink-400 truncate">Pemain 2</span>
                         </div>
                         <div class="grid grid-cols-2 lg:grid-cols-1 gap-2">
@@ -700,6 +700,7 @@
             }
         }
 
+
         const btnSound = document.getElementById('btn-sound');
         const soundIcon = document.getElementById('sound-icon');
         const soundText = document.getElementById('sound-text');
@@ -951,6 +952,17 @@
                 document.getElementById('streak-panel').classList.remove('hidden');
                 document.getElementById('control-tips').innerHTML = "P1: <kbd class='bg-slate-800 px-1 rounded'>WASD</kbd> | P2: <kbd class='bg-slate-800 px-1 rounded'>Panah Arah</kbd>";
 
+                // Tentukan warna P2 secara otomatis agar tidak sama dengan P1
+                if (p1.color === '#10b981') { // Jika P1 Hijau
+                    p2.color = '#ef4444'; // P2 otomatis Merah
+                } else if (p1.color === '#ef4444') { // Jika P1 Merah
+                    p2.color = '#3b82f6'; // P2 otomatis Biru
+                } else { // Jika P1 Biru
+                    p2.color = '#10b981'; // P2 otomatis Hijau
+                }
+                // Ubah warna indikator visual P2 di halaman status
+                document.getElementById('p2-color-indicator').style.backgroundColor = p2.color;
+
                 p2.score = 0; p2.lives = 5; p2.stunned = false; p2.stunTimer = 0; p2.activeGhost = false; p2.ghostTimer = 0;
                 p2.body = [{x: 23, y: 10}, {x: 24, y: 10}, {x: 25, y: 10}];
                 p2.dir = 'LEFT'; p2.nextDir = 'LEFT';
@@ -985,7 +997,7 @@
                 showFloatingMessage("⏸ PERMAINAN DIPAUSE", "text-white");
             } else {
                 btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
-                btn.className = "bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center gap-2";
+                btn.className = "bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 px-4 py-1.5 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-[0_0_10px_rgba(6,182,212,0.1)]";
                 showFloatingMessage("▶ LANJUTKAN!", "text-emerald-300");
             }
             playTone(440, 'sine', 0.1);
@@ -1739,6 +1751,7 @@
             }
         }
 
+        // Tampilkan pesan melayang
         function showFloatingMessage(text, colorClass) {
             const msg = document.getElementById('game-message');
             msg.innerText = text;
