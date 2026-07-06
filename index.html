@@ -194,18 +194,6 @@
                 <p class="text-slate-400 mt-2 text-sm font-semibold">Belajar matematika jadi seru bersama ular pintar!</p>
             </div>
 
-            <!-- Karakter / Pemilihan Warna Ular -->
-            <div class="mb-4 bg-slate-950/70 p-4 rounded-2xl border border-slate-800">
-                <h3 class="text-xs font-bold text-cyan-300 mb-3 text-center uppercase tracking-wider">Pilih Warna Ularmu (Pemain 1)</h3>
-                <div class="flex justify-center gap-4">
-                    <button onclick="setSnakeColor('#10b981', 'green')" id="color-green" class="snake-color-btn w-12 h-12 rounded-full border-4 border-white bg-emerald-500 shadow-lg transform scale-110 transition duration-150 relative">
-                        <span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-sm"></i></span>
-                    </button>
-                    <button onclick="setSnakeColor('#ef4444', 'red')" id="color-red" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-red-500 shadow-lg transition duration-150 relative"></button>
-                    <button onclick="setSnakeColor('#3b82f6', 'blue')" id="color-blue" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-blue-500 shadow-lg transition duration-150 relative"></button>
-                </div>
-            </div>
-
             <!-- MENU TINGKAT KESULITAN -->
             <div class="mb-5 bg-slate-950/70 p-4 rounded-2xl border border-slate-800">
                 <h3 class="text-xs font-bold text-cyan-300 mb-3 text-center uppercase tracking-wider">Pilih Tingkat Kesulitan</h3>
@@ -243,14 +231,14 @@
             </div>
         </div>
 
-        <!-- MODAL FORM IDENTITAS DINAMIS -->
-        <div id="identity-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
-            <div class="bg-slate-900 border max-w-md w-full p-6 rounded-3xl shadow-2xl relative neon-border-cyan">
+        <!-- MODAL FORM IDENTITAS & WARNA ULAR DINAMIS -->
+        <div id="identity-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print font-sans">
+            <div class="bg-slate-900 border max-w-md w-full p-6 rounded-3xl shadow-2xl relative neon-border-cyan overflow-y-auto max-h-[90vh]">
                 <button onclick="closeIdentityForm()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <h3 id="identity-modal-title" class="text-xl font-fredoka text-cyan-400 text-center mb-4 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-id-card"></i> Identitas Petualang
+                    <i class="fa-solid fa-id-card"></i> Identitas & Karakter
                 </h3>
                 
                 <div class="space-y-4">
@@ -264,6 +252,15 @@
                             <input type="text" id="input-p1-name" placeholder="Nama Lengkap..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
                             <input type="text" id="input-p1-class" placeholder="Kelas (Contoh: IV-A)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
                         </div>
+                        <!-- Pemilihan Warna P1 -->
+                        <div class="mt-3">
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1.5">Pilih Warna Ular P1</label>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="setP1Color('#10b981', 'green')" id="p1-color-green" class="p1-color-btn w-9 h-9 rounded-full border-4 border-transparent bg-emerald-500 shadow-lg transition duration-150 relative"></button>
+                                <button type="button" onclick="setP1Color('#ef4444', 'red')" id="p1-color-red" class="p1-color-btn w-9 h-9 rounded-full border-4 border-transparent bg-red-500 shadow-lg transition duration-150 relative"></button>
+                                <button type="button" onclick="setP1Color('#3b82f6', 'blue')" id="p1-color-blue" class="p1-color-btn w-9 h-9 rounded-full border-4 border-transparent bg-blue-500 shadow-lg transition duration-150 relative"></button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Form Pemain 2 (Disembunyikan jika Mode 1P) -->
@@ -275,6 +272,15 @@
                         <div class="space-y-2">
                             <input type="text" id="input-p2-name" placeholder="Nama Lengkap..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition">
                             <input type="text" id="input-p2-class" placeholder="Kelas (Contoh: IV-B)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-pink-500 transition">
+                        </div>
+                        <!-- Pemilihan Warna P2 -->
+                        <div class="mt-3">
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1.5">Pilih Warna Ular P2 (Harus Berbeda)</label>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="setP2Color('#10b981', 'green')" id="p2-color-green" class="p2-color-btn w-9 h-9 rounded-full border-2 border-transparent bg-emerald-500 shadow-lg transition duration-150 relative"></button>
+                                <button type="button" onclick="setP2Color('#ef4444', 'red')" id="p2-color-red" class="p2-color-btn w-9 h-9 rounded-full border-2 border-transparent bg-red-500 shadow-lg transition duration-150 relative"></button>
+                                <button type="button" onclick="setP2Color('#3b82f6', 'blue')" id="p2-color-blue" class="p2-color-btn w-9 h-9 rounded-full border-2 border-transparent bg-blue-500 shadow-lg transition duration-150 relative"></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -700,7 +706,6 @@
             }
         }
 
-
         const btnSound = document.getElementById('btn-sound');
         const soundIcon = document.getElementById('sound-icon');
         const soundText = document.getElementById('sound-text');
@@ -748,8 +753,9 @@
         let currentCertReason = "";
         let currentCertBadge = "";
 
-        // Custom warna ular default
-        let selectedSnakeColor = '#10b981';
+        // Custom warna ular pilihan pemain di formulir modal
+        let p1SelectedColor = '#10b981'; // Default Hijau
+        let p2SelectedColor = '#ef4444'; // Default Merah
 
         let highScore = parseInt(localStorage.getItem('math_snake_highscore')) || 0;
         document.getElementById('high-score-header').innerText = highScore;
@@ -783,20 +789,51 @@
 
 
         // --- MANAJEMEN MENU UTAMA & IDENTITAS ---
-        function setSnakeColor(colorHex, idName) {
-            selectedSnakeColor = colorHex;
-            document.querySelectorAll('.snake-color-btn').forEach(btn => {
+        // Pemilihan Warna Dinamis untuk Pemain 1
+        function setP1Color(colorHex, colorName) {
+            p1SelectedColor = colorHex;
+            document.querySelectorAll('.p1-color-btn').forEach(btn => {
                 btn.innerHTML = '';
-                // Menghapus efek pilihan pada semua tombol warna
                 btn.classList.remove('border-white', 'transform', 'scale-110');
                 btn.classList.add('border-transparent');
             });
             
-            // Memberikan efek pilihan (bingkai putih, ukuran membesar, centang) ke tombol yang dipilih
-            const selectedBtn = document.getElementById('color-' + idName);
+            const selectedBtn = document.getElementById('p1-color-' + colorName);
             selectedBtn.classList.remove('border-transparent');
             selectedBtn.classList.add('border-white', 'transform', 'scale-110');
-            selectedBtn.innerHTML = '<span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-sm"></i></span>';
+            selectedBtn.innerHTML = '<span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-xs"></i></span>';
+            
+            // Logika Auto-Swap: Jika warna P2 sama dengan P1 yang baru dipilih, ubah warna P2
+            if (pendingGameMode === 2 && p2SelectedColor === p1SelectedColor) {
+                const colors = [
+                    { hex: '#10b981', name: 'green' },
+                    { hex: '#ef4444', name: 'red' },
+                    { hex: '#3b82f6', name: 'blue' }
+                ];
+                const altColor = colors.find(c => c.hex !== p1SelectedColor);
+                setP2Color(altColor.hex, altColor.name);
+            }
+            playTone(600, 'sine', 0.05);
+        }
+
+        // Pemilihan Warna Dinamis untuk Pemain 2
+        function setP2Color(colorHex, colorName) {
+            if (colorHex === p1SelectedColor) {
+                showFloatingMessage("Warna ini sudah dipilih Pemain 1!", "text-pink-400");
+                playSfx('wrong');
+                return;
+            }
+            p2SelectedColor = colorHex;
+            document.querySelectorAll('.p2-color-btn').forEach(btn => {
+                btn.innerHTML = '';
+                btn.classList.remove('border-white', 'transform', 'scale-110');
+                btn.classList.add('border-transparent');
+            });
+            
+            const selectedBtn = document.getElementById('p2-color-' + colorName);
+            selectedBtn.classList.remove('border-transparent');
+            selectedBtn.classList.add('border-white', 'transform', 'scale-110');
+            selectedBtn.innerHTML = '<span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-xs"></i></span>';
             
             playTone(600, 'sine', 0.05);
         }
@@ -840,9 +877,16 @@
             if (mode === 2) {
                 document.getElementById('identity-modal-title').innerHTML = '<i class="fa-solid fa-users text-indigo-400"></i> Identitas Pemain (Versus)';
                 document.getElementById('form-p2').classList.remove('hidden');
+                
+                // Set warna awal dinamis dan cegah kesamaan warna
+                setP1Color('#10b981', 'green');
+                setP2Color('#ef4444', 'red');
             } else {
                 document.getElementById('identity-modal-title').innerHTML = '<i class="fa-solid fa-user text-emerald-400"></i> Identitas Petualang (1P)';
                 document.getElementById('form-p2').classList.add('hidden');
+                
+                // Set warna awal default untuk 1P
+                setP1Color('#10b981', 'green');
             }
             playTone(400, 'sine', 0.05);
         }
@@ -907,7 +951,7 @@
 
             p1.score = 0;
             p1.lives = 5;
-            p1.color = selectedSnakeColor;
+            p1.color = p1SelectedColor; // Memperbaiki ReferenceError dengan menggunakan warna pilihan Pemain 1
             p1.isSuper = false; p1.superTimer = 0; p1.activeGhost = false; p1.ghostTimer = 0;
             p1.body = [{x: 6, y: 10}, {x: 5, y: 10}, {x: 4, y: 10}];
             p1.dir = 'RIGHT'; p1.nextDir = 'RIGHT';
@@ -952,14 +996,9 @@
                 document.getElementById('streak-panel').classList.remove('hidden');
                 document.getElementById('control-tips').innerHTML = "P1: <kbd class='bg-slate-800 px-1 rounded'>WASD</kbd> | P2: <kbd class='bg-slate-800 px-1 rounded'>Panah Arah</kbd>";
 
-                // Tentukan warna P2 secara otomatis agar tidak sama dengan P1
-                if (p1.color === '#10b981') { // Jika P1 Hijau
-                    p2.color = '#ef4444'; // P2 otomatis Merah
-                } else if (p1.color === '#ef4444') { // Jika P1 Merah
-                    p2.color = '#3b82f6'; // P2 otomatis Biru
-                } else { // Jika P1 Biru
-                    p2.color = '#10b981'; // P2 otomatis Hijau
-                }
+                // Mengatur warna Pemain 2 sesuai pilihan yang disimpan di p2SelectedColor
+                p2.color = p2SelectedColor;
+                
                 // Ubah warna indikator visual P2 di halaman status
                 document.getElementById('p2-color-indicator').style.backgroundColor = p2.color;
 
@@ -1712,6 +1751,7 @@
 
 
         // --- UI INTERAKTIF ---
+        // Sinkronisasi data HP Pemain 1
         function updateHeartsUI() {
             const container = document.getElementById('p1-hearts');
             container.innerHTML = '';
@@ -1751,7 +1791,6 @@
             }
         }
 
-        // Tampilkan pesan melayang
         function showFloatingMessage(text, colorClass) {
             const msg = document.getElementById('game-message');
             msg.innerText = text;
