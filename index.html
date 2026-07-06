@@ -565,6 +565,51 @@
             }
         }
 
+        // --- SISTEM BGM (BACKGROUND MUSIC) ---
+        // Irama 8-bit ceria untuk mengiringi permainan
+        const bgmMelody = [
+            261.63, 392.00, 329.63, 392.00, // Bar 1 (C Major)
+            349.23, 523.25, 440.00, 523.25, // Bar 2 (F Major)
+            392.00, 587.33, 493.88, 587.33, // Bar 3 (G Major)
+            523.25, 392.00, 261.63, 0       // Bar 4 (C resolving)
+        ];
+        let bgmNoteIndex = 0;
+        let bgmTimer = null;
+
+        function playNextBgmNote() {
+            if (!gameActive) return; // Hentikan loop jika game tidak aktif
+            
+            if (soundEnabled && !isPaused) {
+                let freq = bgmMelody[bgmNoteIndex];
+                if (freq > 0) {
+                    // Volume sangat kecil (0.02) agar hanya menjadi musik latar dan tidak menutupi efek suara
+                    playTone(freq, 'triangle', 0.15, 0.02);
+                }
+                bgmNoteIndex = (bgmNoteIndex + 1) % bgmMelody.length;
+            }
+            
+            // Kecepatan musik beradaptasi secara dinamis sesuai kecepatan game (speedMultiplier)
+            // Awal permainan = 250ms, semakin cepat game berjalan, tempo musik semakin naik
+            let currentBgmSpeed = 250 / speedMultiplier; 
+            if (comboModeActive) currentBgmSpeed *= 0.8; // Musik lebih kencang saat Mode Combo
+            
+            bgmTimer = setTimeout(playNextBgmNote, currentBgmSpeed);
+        }
+
+        function startBGM() {
+            stopBGM();
+            bgmNoteIndex = 0;
+            playNextBgmNote();
+        }
+
+        function stopBGM() {
+            if (bgmTimer) {
+                clearTimeout(bgmTimer);
+                bgmTimer = null;
+            }
+        }
+
+
         const btnSound = document.getElementById('btn-sound');
         const soundIcon = document.getElementById('sound-icon');
         const soundText = document.getElementById('sound-text');
@@ -800,6 +845,7 @@
             runGameLoop();
             
             playSfx('correct');
+            startBGM(); // Mulai memutar musik instrumen
         }
 
         // --- SISTEM PAUSE ---
@@ -848,6 +894,7 @@
             clearInterval(gameLoopTimer);
             clearInterval(comboCountdownInterval);
             clearInterval(timerInterval);
+            stopBGM(); // Hentikan musik saat ke menu
             document.getElementById('game-timer-display').classList.add('hidden');
             document.getElementById('gameplay-screen').classList.add('hidden');
             document.getElementById('evaluation-screen').classList.add('hidden');
@@ -1502,6 +1549,7 @@
             clearInterval(gameLoopTimer);
             clearInterval(comboCountdownInterval);
             clearInterval(timerInterval);
+            stopBGM(); // Hentikan BGM saat Game Over
             playSfx('gameover');
 
             const m = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
