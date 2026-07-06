@@ -14,8 +14,15 @@
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background: radial-gradient(circle, #1e1b4b 0%, #0f172a 100%);
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             touch-action: none; /* Mencegah geser layar default di perangkat mobile */
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .font-fredoka {
             font-family: 'Fredoka One', cursive;
@@ -191,12 +198,14 @@
                         </div>
                         <div class="grid grid-cols-2 lg:grid-cols-1 gap-2">
                             <div class="bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                                <span class="block text-[10px] text-slate-400 font-bold uppercase">Skor (Maks: 100)</span>
+                                <span class="block text-[10px] text-slate-400 font-bold uppercase">Skor (Maks: 1000)</span>
                                 <span id="p1-score" class="font-fredoka text-xl text-emerald-300">0</span>
                             </div>
                             <div id="p1-hearts-box" class="bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800 flex flex-col justify-center">
                                 <span class="block text-[10px] text-slate-400 font-bold uppercase mb-0.5">Nyawa</span>
                                 <div id="p1-hearts" class="flex gap-1 text-red-500 text-sm">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <i class="fa-solid fa-heart"></i>
                                     <i class="fa-solid fa-heart"></i>
                                     <i class="fa-solid fa-heart"></i>
                                     <i class="fa-solid fa-heart"></i>
@@ -236,7 +245,7 @@
                 </div>
 
                 <!-- Arena Canvas (Tengah) -->
-                <div class="lg:w-3/4 flex flex-col items-center justify-center bg-slate-950 rounded-2xl overflow-hidden relative shadow-inner border border-slate-800">
+                <div class="lg:w-3/4 flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-md rounded-2xl overflow-hidden relative shadow-2xl border border-white/10">
                     <!-- overlay pesan mengambang -->
                     <div id="game-message" class="absolute pointer-events-none transform scale-0 opacity-0 transition-all duration-300 font-fredoka text-xl text-center z-20 bg-slate-900/90 border border-amber-500/50 px-6 py-3 rounded-full text-yellow-300 shadow-2xl flex items-center gap-2"></div>
 
@@ -397,7 +406,7 @@
                             Atas keberhasilan luar biasa menyelesaikan seluruh tantangan permainan matematika dasar kelas 4 SD secara sempurna dengan nilai maksimal:
                         </p>
                         <div class="my-3 inline-block bg-amber-100 border border-amber-300 text-amber-800 font-fredoka px-6 py-1.5 rounded-full text-base shadow-sm">
-                            SKOR SANGAT MEMUASKAN: 100/100 SOAL SATUAN
+                            SKOR SANGAT MEMUASKAN: 1000/1000 SOAL SATUAN
                         </div>
                     </div>
 
@@ -539,7 +548,7 @@
         let gameMode = 1;
         let gameActive = false;
         let gameLoopTimer = null;
-        let baseSpeed = 160;
+        let baseSpeed = 250; // Awal pergerakan dibuat lambat (sebelumnya 160)
         let speedMultiplier = 1;
 
         // Nama & Kelas Siswa
@@ -560,7 +569,7 @@
             nextDir: 'RIGHT',
             color: '#10b981',
             score: 0,
-            lives: 3,
+            lives: 5,
             isSuper: false,
             superTimer: 0,
             activeGhost: false,
@@ -670,7 +679,7 @@
 
             // Reset parameter game
             p1.score = 0;
-            p1.lives = 3;
+            p1.lives = 5;
             p1.color = selectedSnakeColor;
             p1.isSuper = false;
             p1.superTimer = 0;
@@ -950,11 +959,16 @@
             const gridCols = canvasWidth / gridUnit;
             const gridRows = canvasHeight / gridUnit;
 
-            let hitWallP1 = (headX1 < 0 || headX1 >= gridCols || headY1 < 0 || headY1 >= gridRows);
+            // Fitur Tembus Tembok P1
+            if (headX1 < 0) headX1 = gridCols - 1;
+            else if (headX1 >= gridCols) headX1 = 0;
+            if (headY1 < 0) headY1 = gridRows - 1;
+            else if (headY1 >= gridRows) headY1 = 0;
+
             let hitSelfP1 = p1.body.some((segment, idx) => idx !== 0 && segment.x === headX1 && segment.y === headY1);
 
-            if (hitWallP1 || hitSelfP1) {
-                handleSnakeDamage(1, "Tabrakan!");
+            if (hitSelfP1) {
+                handleSnakeDamage(1, "Tabrakan Badan!");
                 return;
             }
 
@@ -1007,11 +1021,16 @@
                     else if (p2.dir === 'LEFT') headX2--;
                     else if (p2.dir === 'RIGHT') headX2++;
 
-                    let hitWallP2 = (headX2 < 0 || headX2 >= gridCols || headY2 < 0 || headY2 >= gridRows);
+                    // Fitur Tembus Tembok P2
+                    if (headX2 < 0) headX2 = gridCols - 1;
+                    else if (headX2 >= gridCols) headX2 = 0;
+                    if (headY2 < 0) headY2 = gridRows - 1;
+                    else if (headY2 >= gridRows) headY2 = 0;
+
                     let hitSelfP2 = p2.body.some((segment, idx) => idx !== 0 && segment.x === headX2 && segment.y === headY2);
 
-                    if (hitWallP2 || hitSelfP2) {
-                        handleSnakeDamage(2, "P2 Tabrak Dinding!");
+                    if (hitSelfP2) {
+                        handleSnakeDamage(2, "P2 Tabrak Badan!");
                         return;
                     }
 
@@ -1073,9 +1092,9 @@
 
                 if (playerNum === 1) {
                     p1.score += pointsEarned;
-                    // Batasi skor maksimal hingga 100
-                    if (p1.score >= 100) {
-                        p1.score = 100;
+                    // Batasi skor maksimal hingga 1000
+                    if (p1.score >= 1000) {
+                        p1.score = 1000;
                     }
                     document.getElementById('p1-score').innerText = p1.score;
                     showFloatingMessage(`+${pointsEarned} Jawaban Benar!`, "text-green-400");
@@ -1093,18 +1112,16 @@
                     showFloatingMessage(`P2 +${pointsEarned} Benar!`, "text-cyan-400");
                 }
 
-                // Cek apakah P1 mencapai Skor Maksimal (100)
-                if (p1.score >= 100) {
+                // Cek apakah P1 mencapai Skor Maksimal (1000)
+                if (p1.score >= 1000) {
                     endGame();
                     return;
                 }
 
-                const totalScore = p1.score + (gameMode === 2 ? p2.score : 0);
-                if (totalScore % 50 === 0 && totalScore > 0) {
-                    speedMultiplier = Math.min(speedMultiplier + 0.15, 2.5);
-                    showFloatingMessage("⚡ Kecepatan Ular Meningkat!", "text-amber-400");
-                    updateGameLoopSpeed();
-                }
+                // Kecepatan akan meningkat perlahan setiap kali pemain memakan jawaban yang benar
+                // Peningkatan dibuat sangat kecil agar tidak signifikan dan dibatasi maksimal 2x lipat kecepatan awal
+                speedMultiplier = Math.min(speedMultiplier + 0.01, 2.0);
+                updateGameLoopSpeed();
 
                 if (gameMode === 2 && comboModeActive) {
                     if (playerNum === 1) {
@@ -1286,33 +1303,29 @@
         function drawGame() {
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-            // 1. Gambar Grid Background
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 0.5;
+            // 1. Gambar Background Papan Catur Ceria (Checkerboard Transparan)
             for (let x = 0; x < canvasWidth; x += gridUnit) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvasHeight);
-                ctx.stroke();
-            }
-            for (let y = 0; y < canvasHeight; y += gridUnit) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvasWidth, y);
-                ctx.stroke();
+                for (let y = 0; y < canvasHeight; y += gridUnit) {
+                    if (((x / gridUnit) + (y / gridUnit)) % 2 === 0) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                    } else {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                    }
+                    ctx.fillRect(x, y, gridUnit, gridUnit);
+                }
             }
 
             // 2. Jika Combo Mode aktif, berikan latar keemasan
             if (comboModeActive) {
-                ctx.fillStyle = 'rgba(245, 158, 11, 0.04)';
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
                 ctx.fillRect(0, 0, canvasWidth, canvasHeight);
                 
-                ctx.strokeStyle = 'rgba(245, 158, 11, 0.2)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+                ctx.lineWidth = 3;
                 ctx.strokeRect(0, 0, canvasWidth, canvasHeight);
             }
 
-            // 3. Gambar Makanan (Opsi Angka)
+            // 3. Gambar Makanan (Opsi Angka) - Sekarang semua makanan tampil sama rata
             currentQuestion.choices.forEach(food => {
                 const cx = food.x * gridUnit + gridUnit / 2;
                 const cy = food.y * gridUnit + gridUnit / 2;
@@ -1323,32 +1336,22 @@
                 ctx.save();
                 ctx.shadowBlur = 10;
 
-                if (food.isGolden) {
-                    ctx.shadowColor = '#fbbf24';
-                    ctx.fillStyle = '#fbbf24';
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, radius * 1.2, 0, Math.PI * 2);
-                    ctx.fill();
+                // Menggunakan desain apel merah yang seragam untuk semua makanan (normal & combo)
+                ctx.shadowColor = '#ef4444';
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                ctx.fill();
 
-                    ctx.fillStyle = '#f59e0b';
-                    ctx.beginPath();
-                    ctx.ellipse(cx + 3, cy - radius - 2, 3, 5, Math.PI / 4, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.shadowColor = '#ef4444';
-                    ctx.fillStyle = '#ef4444';
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#10b981';
-                    ctx.beginPath();
-                    ctx.ellipse(cx + 2, cy - radius - 1, 2, 4, Math.PI / 4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                // Daun hijau pada buah
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath();
+                ctx.ellipse(cx + 2, cy - radius - 1, 2, 4, Math.PI / 4, 0, Math.PI * 2);
+                ctx.fill();
+                
                 ctx.restore();
 
-                // Gambar Label Angka di atas buah
+                // Gambar Label Angka di atas buah (Seragam warna putih)
                 ctx.save();
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowColor = '#000000';
@@ -1361,7 +1364,7 @@
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
                 ctx.fillRect(cx - (textWidth/2) - 4, cy - 8, textWidth + 8, 16);
                 
-                ctx.fillStyle = food.isGolden ? '#fbbf24' : '#ffffff';
+                ctx.fillStyle = '#ffffff'; // Teks selalu warna putih seragam
                 ctx.font = 'bold 13px Nunito';
                 ctx.fillText(food.value, cx, cy + 1);
                 ctx.restore();
@@ -1462,7 +1465,7 @@
         function updateHeartsUI() {
             const container = document.getElementById('p1-hearts');
             container.innerHTML = '';
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 5; i++) {
                 const heart = document.createElement('i');
                 if (i < p1.lives) {
                     heart.className = "fa-solid fa-heart text-red-500 animate-pulse";
@@ -1532,8 +1535,8 @@
             } else {
                 document.getElementById('eval-title').innerText = "Petualangan Berakhir!";
                 
-                // Jika Skor P1 adalah 100 (Skor Maksimal), munculkan tombol klaim Sertifikat
-                if (p1.score >= 100) {
+                // Jika Skor P1 adalah 1000 (Skor Maksimal), munculkan tombol klaim Sertifikat
+                if (p1.score >= 1000) {
                     document.getElementById('claim-certificate-container').classList.remove('hidden');
                 } else {
                     document.getElementById('claim-certificate-container').classList.add('hidden');
@@ -1544,8 +1547,8 @@
             const starsContainer = document.getElementById('eval-stars');
             starsContainer.innerHTML = '';
             let starsEarned = 1;
-            if (p1.score >= 100) starsEarned = 3;
-            else if (p1.score >= 40) starsEarned = 2;
+            if (p1.score >= 1000) starsEarned = 3;
+            else if (p1.score >= 400) starsEarned = 2; // Menyesuaikan rasio bintang dengan skor 1000
 
             for (let i = 0; i < 3; i++) {
                 const star = document.createElement('i');
@@ -1603,7 +1606,7 @@
             document.getElementById('cert-student-name').innerText = studentName;
             document.getElementById('cert-student-class').innerText = studentClass;
             
-            // Format tanggal hari ini di tahun 2026
+            // Format tanggal 
             const currentDate = new Date();
             const formatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const dateStr = currentDate.toLocaleDateString('id-ID', formatOptions);
