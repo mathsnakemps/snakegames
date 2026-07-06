@@ -195,7 +195,7 @@
             </div>
 
             <!-- Karakter / Pemilihan Warna Ular -->
-            <div class="mb-5 bg-slate-950/70 p-4 rounded-2xl border border-slate-800">
+            <div class="mb-4 bg-slate-950/70 p-4 rounded-2xl border border-slate-800">
                 <h3 class="text-xs font-bold text-cyan-300 mb-3 text-center uppercase tracking-wider">Pilih Warna Ularmu (Pemain 1)</h3>
                 <div class="flex justify-center gap-4">
                     <button onclick="setSnakeColor('#10b981', 'green')" id="color-green" class="snake-color-btn w-12 h-12 rounded-full border-4 border-white bg-emerald-500 shadow-lg transform scale-110 transition duration-150 relative">
@@ -203,6 +203,25 @@
                     </button>
                     <button onclick="setSnakeColor('#ef4444', 'red')" id="color-red" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-red-500 shadow-lg transition duration-150 relative"></button>
                     <button onclick="setSnakeColor('#3b82f6', 'blue')" id="color-blue" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-blue-500 shadow-lg transition duration-150 relative"></button>
+                </div>
+            </div>
+
+            <!-- MENU TINGKAT KESULITAN -->
+            <div class="mb-5 bg-slate-950/70 p-4 rounded-2xl border border-slate-800">
+                <h3 class="text-xs font-bold text-cyan-300 mb-3 text-center uppercase tracking-wider">Pilih Tingkat Kesulitan</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setDifficulty('beginner')" id="diff-beginner" class="difficulty-btn py-2 px-1 rounded-xl border-2 border-cyan-500 bg-cyan-500/20 text-xs font-bold text-cyan-300 transition duration-150 text-center">
+                        Beginner
+                    </button>
+                    <button onclick="setDifficulty('intermediate')" id="diff-intermediate" class="difficulty-btn py-2 px-1 rounded-xl border-2 border-transparent bg-slate-900/60 text-xs font-bold text-slate-400 transition duration-150 text-center">
+                        Intermediate
+                    </button>
+                    <button onclick="setDifficulty('expert')" id="diff-expert" class="difficulty-btn py-2 px-1 rounded-xl border-2 border-transparent bg-slate-900/60 text-xs font-bold text-slate-400 transition duration-150 text-center">
+                        Expert
+                    </button>
+                </div>
+                <div id="difficulty-desc" class="text-[11px] text-cyan-300/80 mt-2.5 text-center font-semibold italic">
+                    Perhitungan angka satuan (0-9) & kecepatan ular stabil melambat.
                 </div>
             </div>
 
@@ -712,6 +731,9 @@
         let baseSpeed = 250; 
         let speedMultiplier = 1;
 
+        // Pilihan Tingkat Kesulitan Default
+        let currentDifficulty = 'beginner'; // 'beginner', 'intermediate', 'expert'
+
         // Nama & Kelas Siswa
         let pendingGameMode = 1;
         let studentName = "";
@@ -776,6 +798,29 @@
             selectedBtn.innerHTML = '<span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-sm"></i></span>';
             
             playTone(600, 'sine', 0.05);
+        }
+
+        // Pengatur Tingkat Kesulitan UI & Deskripsi
+        function setDifficulty(level) {
+            currentDifficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('border-cyan-500', 'bg-cyan-500/20', 'text-cyan-300');
+                btn.classList.add('border-transparent', 'bg-slate-900/60', 'text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById('diff-' + level);
+            activeBtn.classList.remove('border-transparent', 'bg-slate-900/60', 'text-slate-400');
+            activeBtn.classList.add('border-cyan-500', 'bg-cyan-500/20', 'text-cyan-300');
+
+            const descEl = document.getElementById('difficulty-desc');
+            if (level === 'beginner') {
+                descEl.innerText = "Perhitungan angka satuan (0-9) & pergerakan ular stabil melambat.";
+            } else if (level === 'intermediate') {
+                descEl.innerText = "Perhitungan angka satuan & puluhan. Pergerakan ular bertambah cepat bertahap.";
+            } else if (level === 'expert') {
+                descEl.innerText = "Perhitungan puluhan & ratusan. Pergerakan ular cepat & menantang sejak awal!";
+            }
+            playTone(500, 'sine', 0.05);
         }
 
         function toggleHowToPlay(show) {
@@ -890,6 +935,15 @@
                 }
             }, 1000);
 
+            // Pengaturan Kecepatan Awal Berdasarkan Tingkat Kesulitan
+            if (currentDifficulty === 'beginner') {
+                baseSpeed = 280; // Lambat & stabil
+            } else if (currentDifficulty === 'intermediate') {
+                baseSpeed = 220; // Menengah
+            } else {
+                baseSpeed = 160; // Cepat (Expert)
+            }
+
             // Setup Mode Versus
             if (gameMode === 2) {
                 document.getElementById('p2-status-panel').classList.remove('hidden');
@@ -974,7 +1028,7 @@
         }
 
 
-        // --- LOGIKA GENERATOR SOAL MATEMATIKA SATUAN (0-9) ---
+        // --- LOGIKA GENERATOR SOAL MATEMATIKA DINAMIS BERDASARKAN KESULITAN ---
         function generateNewQuestion() {
             let type, num1, num2;
             let realAnswer = 0;
@@ -983,44 +1037,106 @@
             // Loop untuk menjamin soal baru tidak sama dengan soal sebelumnya
             do {
                 if (comboModeActive) {
-                    const subType = Math.floor(Math.random() * 2);
-                    if (subType === 0) {
+                    // --- SOAL COMBO BERDASARKAN KESULITAN ---
+                    if (currentDifficulty === 'beginner') {
+                        // Beginner: Angka satuan murni, hasil <= 9
                         let a = Math.floor(Math.random() * 3) + 1; // 1-3
                         let b = Math.floor(Math.random() * 3);     // 0-2
                         let c = Math.floor(Math.random() * 3);     // 0-2
                         realAnswer = (a * b) + c;
                         newText = `(${a} x ${b}) + ${c} = ...?`;
+                    } else if (currentDifficulty === 'intermediate') {
+                        // Intermediate: Angka satuan & puluhan, hasil <= 99
+                        let a = Math.floor(Math.random() * 8) + 3; // 3-10
+                        let b = Math.floor(Math.random() * 8) + 2; // 2-9
+                        let c = Math.floor(Math.random() * 20) + 1; // 1-20
+                        realAnswer = (a * b) + c;
+                        newText = `(${a} x ${b}) + ${c} = ...?`;
                     } else {
-                        let c = Math.floor(Math.random() * 3) + 1; // 1-3
-                        let bResult = Math.floor(Math.random() * 3); // 0-2
-                        let b = bResult * c; 
-                        let a = Math.floor(Math.random() * 4) + bResult; 
-                        realAnswer = a - bResult;
-                        newText = `${a} - (${b} : ${c}) = ...?`;
+                        // Expert: Angka puluhan & ratusan, hasil s/d 500
+                        let a = Math.floor(Math.random() * 15) + 10; // 10-24
+                        let b = Math.floor(Math.random() * 15) + 5;  // 5-19
+                        let c = Math.floor(Math.random() * 100) + 10; // 10-109
+                        realAnswer = (a * b) + c;
+                        newText = `(${a} x ${b}) + ${c} = ...?`;
                     }
                 } else {
-                    type = Math.floor(Math.random() * 4);
-                    if (type === 0) {
-                        num1 = Math.floor(Math.random() * 6); // 0-5
-                        num2 = Math.floor(Math.random() * (10 - num1)); // agar hasil tetap satuan
-                        realAnswer = num1 + num2;
-                        newText = `${num1} + ${num2} = ...?`;
-                    } else if (type === 1) {
-                        num1 = Math.floor(Math.random() * 10); // 0-9
-                        num2 = Math.floor(Math.random() * (num1 + 1)); // agar tidak minus
-                        realAnswer = num1 - num2;
-                        newText = `${num1} - ${num2} = ...?`;
-                    } else if (type === 2) {
-                        num1 = Math.floor(Math.random() * 4); // 0-3
-                        num2 = Math.floor(Math.random() * 3) + 1; // 1-3
-                        realAnswer = num1 * num2;
-                        newText = `${num1} x ${num2} = ...?`;
+                    // --- SOAL NORMAL BERDASARKAN KESULITAN ---
+                    if (currentDifficulty === 'beginner') {
+                        // BEGINNER: Satuan (0-9)
+                        type = Math.floor(Math.random() * 4);
+                        if (type === 0) { // +
+                            num1 = Math.floor(Math.random() * 6); // 0-5
+                            num2 = Math.floor(Math.random() * (10 - num1)); // agar hasil <= 9
+                            realAnswer = num1 + num2;
+                            newText = `${num1} + ${num2} = ...?`;
+                        } else if (type === 1) { // -
+                            num1 = Math.floor(Math.random() * 10); // 0-9
+                            num2 = Math.floor(Math.random() * (num1 + 1));
+                            realAnswer = num1 - num2;
+                            newText = `${num1} - ${num2} = ...?`;
+                        } else if (type === 2) { // *
+                            num1 = Math.floor(Math.random() * 4); // 0-3
+                            num2 = Math.floor(Math.random() * 3) + 1; // 1-3
+                            realAnswer = num1 * num2;
+                            newText = `${num1} x ${num2} = ...?`;
+                        } else { // :
+                            let divisor = Math.floor(Math.random() * 4) + 1; // 1-4
+                            let quotient = Math.floor(Math.random() * 3); // 0-2
+                            let dividend = divisor * quotient;
+                            realAnswer = quotient;
+                            newText = `${dividend} : ${divisor} = ...?`;
+                        }
+                    } else if (currentDifficulty === 'intermediate') {
+                        // INTERMEDIATE: Campuran Satuan & Puluhan (10-99)
+                        type = Math.floor(Math.random() * 4);
+                        if (type === 0) { // + (Puluhan)
+                            num1 = Math.floor(Math.random() * 40) + 10; // 10-49
+                            num2 = Math.floor(Math.random() * 40) + 10; // 10-49
+                            realAnswer = num1 + num2;
+                            newText = `${num1} + ${num2} = ...?`;
+                        } else if (type === 1) { // - (Puluhan)
+                            num1 = Math.floor(Math.random() * 80) + 20; // 20-99
+                            num2 = Math.floor(Math.random() * (num1 - 5)) + 5;
+                            realAnswer = num1 - num2;
+                            newText = `${num1} - ${num2} = ...?`;
+                        } else if (type === 2) { // * (Puluhan/Satuan)
+                            num1 = Math.floor(Math.random() * 10) + 2; // 2-11
+                            num2 = Math.floor(Math.random() * 8) + 2;  // 2-9
+                            realAnswer = num1 * num2;
+                            newText = `${num1} x ${num2} = ...?`;
+                        } else { // : (Puluhan/Satuan)
+                            let divisor = Math.floor(Math.random() * 8) + 2; // 2-9
+                            let quotient = Math.floor(Math.random() * 9) + 2; // 2-10
+                            let dividend = divisor * quotient;
+                            realAnswer = quotient;
+                            newText = `${dividend} : ${divisor} = ...?`;
+                        }
                     } else {
-                        let divisor = Math.floor(Math.random() * 4) + 1; // 1-4
-                        let quotient = Math.floor(Math.random() * 3); // 0-2 (Hasil)
-                        let dividend = divisor * quotient; 
-                        realAnswer = quotient;
-                        newText = `${dividend} : ${divisor} = ...?`;
+                        // EXPERT: Campuran Puluhan & Ratusan (100-500)
+                        type = Math.floor(Math.random() * 4);
+                        if (type === 0) { // + (Ratusan)
+                            num1 = Math.floor(Math.random() * 200) + 100; // 100-299
+                            num2 = Math.floor(Math.random() * 150) + 50;  // 50-199
+                            realAnswer = num1 + num2;
+                            newText = `${num1} + ${num2} = ...?`;
+                        } else if (type === 1) { // - (Ratusan)
+                            num1 = Math.floor(Math.random() * 400) + 100; // 100-499
+                            num2 = Math.floor(Math.random() * (num1 - 50)) + 50;
+                            realAnswer = num1 - num2;
+                            newText = `${num1} - ${num2} = ...?`;
+                        } else if (type === 2) { // * (Ratusan/Puluhan)
+                            num1 = Math.floor(Math.random() * 20) + 8; // 8-27
+                            num2 = Math.floor(Math.random() * 12) + 4; // 4-15
+                            realAnswer = num1 * num2;
+                            newText = `${num1} x ${num2} = ...?`;
+                        } else { // : (Ratusan/Puluhan)
+                            let divisor = Math.floor(Math.random() * 15) + 4; // 4-18
+                            let quotient = Math.floor(Math.random() * 15) + 5; // 5-19
+                            let dividend = divisor * quotient;
+                            realAnswer = quotient;
+                            newText = `${dividend} : ${divisor} = ...?`;
+                        }
                     }
                 }
             } while (newText === lastQuestionText);
@@ -1029,9 +1145,19 @@
             currentQuestion.answer = realAnswer;
             currentQuestion.text = newText;
 
+            // Generate 3 Pilihan Jawaban Pengecoh Berdasarkan Kesulitan
             let choicesValues = [realAnswer];
             while (choicesValues.length < 4) {
-                let fakeAnswer = Math.floor(Math.random() * 10);
+                let fakeAnswer = 0;
+                if (currentDifficulty === 'beginner') {
+                    fakeAnswer = Math.floor(Math.random() * 10); // Satuan (0-9)
+                } else if (currentDifficulty === 'intermediate') {
+                    let offset = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 10) + 1);
+                    fakeAnswer = Math.max(0, Math.min(99, realAnswer + offset)); // Puluhan
+                } else {
+                    let offset = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 30) + 1);
+                    fakeAnswer = Math.max(0, Math.min(499, realAnswer + offset)); // Ratusan
+                }
                 if (!choicesValues.includes(fakeAnswer)) choicesValues.push(fakeAnswer);
             }
             choicesValues.sort(() => Math.random() - 0.5);
@@ -1296,7 +1422,15 @@
                     return;
                 }
 
-                speedMultiplier = Math.min(speedMultiplier + 0.01, 2.0);
+                // Kecepatan meningkat bertahap berdasarkan tingkat kesulitan yang dipilih
+                let speedInc = 0.005; // Beginner (tidak signifikan)
+                if (currentDifficulty === 'intermediate') {
+                    speedInc = 0.015; // Lumayan signifikan
+                } else if (currentDifficulty === 'expert') {
+                    speedInc = 0.03;  // Cepat & signifikan
+                }
+                
+                speedMultiplier = Math.min(speedMultiplier + speedInc, 2.5);
                 updateGameLoopSpeed();
 
                 // Ghost Mode untuk Versus
@@ -1639,6 +1773,8 @@
             document.getElementById('gameplay-screen').classList.add('hidden');
             document.getElementById('evaluation-screen').classList.remove('hidden');
 
+            let difficultyLabel = currentDifficulty.toUpperCase();
+
             if (gameMode === 2) {
                 document.getElementById('eval-title').innerText = "Pertandingan Selesai!";
                 document.getElementById('eval-final-score').innerText = Math.max(p1.score, p2.score);
@@ -1648,35 +1784,39 @@
                     winnerText = `Lawan KO! ${studentName} Menang! 🏆`;
                     currentWinnerName = studentName;
                     currentWinnerClass = studentClass;
-                    currentCertReason = "Atas keberhasilan luar biasa memenangkan Mode Tanding (Versus) dengan mengalahkan lawan hingga kehabisan HEALTH POINT (Knock Out)!";
-                    currentCertBadge = "KEMENANGAN MUTLAK: LAWAN KO!";
+                    currentCertReason = `Atas keberhasilan luar biasa memenangkan Mode Tanding (Versus) Tingkat ${difficultyLabel} dengan mengalahkan lawan hingga kehabisan HEALTH POINT (Knock Out)!`;
+                    currentCertBadge = `KEMENANGAN MUTLAK [${difficultyLabel}]: LAWAN KO!`;
                 } else if (p1.lives <= 0) {
                     winnerText = `Lawan KO! ${student2Name} Menang! 🏆`;
                     currentWinnerName = student2Name;
                     currentWinnerClass = student2Class;
-                    currentCertReason = "Atas keberhasilan luar biasa memenangkan Mode Tanding (Versus) dengan mengalahkan lawan hingga kehabisan HEALTH POINT (Knock Out)!";
-                    currentCertBadge = "KEMENANGAN MUTLAK: LAWAN KO!";
+                    currentCertReason = `Atas keberhasilan luar biasa memenangkan Mode Tanding (Versus) Tingkat ${difficultyLabel} dengan mengalahkan lawan hingga kehabisan HEALTH POINT (Knock Out)!`;
+                    currentCertBadge = `KEMENANGAN MUTLAK [${difficultyLabel}]: LAWAN KO!`;
                 } else if (p1.score >= 500) {
                     winnerText = `Selamat, ${studentName} Menang! 🏆`;
                     currentWinnerName = studentName;
                     currentWinnerClass = studentClass;
-                    currentCertReason = "Atas keberhasilan memenangkan Mode Tanding (Versus) dengan menjadi yang tercepat mencapai target skor maksimal:";
-                    currentCertBadge = "SKOR MAKSIMAL: 500 POIN!";
+                    currentCertReason = `Atas keberhasilan memenangkan Mode Tanding (Versus) Tingkat ${difficultyLabel} dengan menjadi yang tercepat mencapai target skor maksimal:`;
+                    currentCertBadge = `SKOR MAKSIMAL [${difficultyLabel}]: 500 POIN!`;
                 } else if (p2.score >= 500) {
                     winnerText = `Selamat, ${student2Name} Menang! 🏆`;
                     currentWinnerName = student2Name;
                     currentWinnerClass = student2Class;
-                    currentCertReason = "Atas keberhasilan memenangkan Mode Tanding (Versus) dengan menjadi yang tercepat mencapai target skor maksimal:";
-                    currentCertBadge = "SKOR MAKSIMAL: 500 POIN!";
+                    currentCertReason = `Atas keberhasilan memenangkan Mode Tanding (Versus) Tingkat ${difficultyLabel} dengan menjadi yang tercepat mencapai target skor maksimal:`;
+                    currentCertBadge = `SKOR MAKSIMAL [${difficultyLabel}]: 500 POIN!`;
                 } else {
                     if (p1.score > p2.score) {
                         winnerText = `Selamat, ${studentName} Menang! 🏆`;
                         currentWinnerName = studentName;
                         currentWinnerClass = studentClass;
+                        currentCertReason = `Atas skor akhir yang lebih unggul pada akhir pertandingan Mode Tanding (Versus) Tingkat ${difficultyLabel}:`;
+                        currentCertBadge = `UNGGUL SKOR [${difficultyLabel}]: ${p1.score} POIN!`;
                     } else if (p2.score > p1.score) {
                         winnerText = `Selamat, ${student2Name} Menang! 🏆`;
                         currentWinnerName = student2Name;
                         currentWinnerClass = student2Class;
+                        currentCertReason = `Atas skor akhir yang lebih unggul pada akhir pertandingan Mode Tanding (Versus) Tingkat ${difficultyLabel}:`;
+                        currentCertBadge = `UNGGUL SKOR [${difficultyLabel}]: ${p2.score} POIN!`;
                     } else {
                         winnerText = "Wah, Pertandingan Seri! 🤝";
                     }
@@ -1694,8 +1834,8 @@
                 document.getElementById('eval-title').innerText = "Petualangan Berakhir!";
                 currentWinnerName = studentName;
                 currentWinnerClass = studentClass;
-                currentCertReason = "Atas keberhasilan luar biasa menyelesaikan seluruh tantangan permainan matematika dasar secara sempurna dengan nilai maksimal:";
-                currentCertBadge = "SKOR SANGAT MEMUASKAN: 500 POIN";
+                currentCertReason = `Atas keberhasilan luar biasa menyelesaikan seluruh tantangan permainan matematika dasar Tingkat ${difficultyLabel} secara sempurna dengan nilai maksimal:`;
+                currentCertBadge = `SKOR SANGAT MEMUASKAN [${difficultyLabel}]: 500 POIN`;
                 
                 if (p1.score >= 500) {
                     document.getElementById('claim-certificate-container').classList.remove('hidden');
