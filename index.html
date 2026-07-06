@@ -130,8 +130,8 @@
                     <button onclick="setSnakeColor('#10b981', 'green')" id="color-green" class="snake-color-btn w-12 h-12 rounded-full border-4 border-white bg-emerald-500 shadow-lg transform scale-110 transition duration-150 relative">
                         <span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-sm"></i></span>
                     </button>
-                    <button onclick="setSnakeColor('#ef4444', 'red')" id="color-red" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-red-500 shadow-lg transition duration-150"></button>
-                    <button onclick="setSnakeColor('#3b82f6', 'blue')" id="color-blue" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-blue-500 shadow-lg transition duration-150"></button>
+                    <button onclick="setSnakeColor('#ef4444', 'red')" id="color-red" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-red-500 shadow-lg transition duration-150 relative"></button>
+                    <button onclick="setSnakeColor('#3b82f6', 'blue')" id="color-blue" class="snake-color-btn w-12 h-12 rounded-full border-4 border-transparent bg-blue-500 shadow-lg transition duration-150 relative"></button>
                 </div>
             </div>
 
@@ -648,11 +648,17 @@
             selectedSnakeColor = colorHex;
             document.querySelectorAll('.snake-color-btn').forEach(btn => {
                 btn.innerHTML = '';
-                btn.className = btn.className.replace('border-white', 'border-transparent');
+                // Menghapus efek pilihan pada semua tombol warna
+                btn.classList.remove('border-white', 'transform', 'scale-110');
+                btn.classList.add('border-transparent');
             });
+            
+            // Memberikan efek pilihan (bingkai putih, ukuran membesar, centang) ke tombol yang dipilih
             const selectedBtn = document.getElementById('color-' + idName);
-            selectedBtn.className = selectedBtn.className.replace('border-transparent', 'border-white');
+            selectedBtn.classList.remove('border-transparent');
+            selectedBtn.classList.add('border-white', 'transform', 'scale-110');
             selectedBtn.innerHTML = '<span class="absolute inset-0 flex items-center justify-center text-white"><i class="fa-solid fa-check text-sm"></i></span>';
+            
             playTone(600, 'sine', 0.05);
         }
 
